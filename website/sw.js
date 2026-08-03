@@ -11,5 +11,10 @@ self.addEventListener('fetch', event => {
       caches.open(CACHE).then(cache => cache.put(event.request, copy)).catch(() => {});
     }
     return response;
-  }).catch(() => caches.match(event.request)));
+  }).catch(async () => {
+    const cached = await caches.match(event.request);
+    if (cached) return cached;
+    if (event.request.mode === 'navigate') return caches.match('./index.html');
+    return Response.error();
+  }));
 });
