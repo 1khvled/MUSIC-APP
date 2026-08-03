@@ -55,6 +55,7 @@ offlineButton.onclick = async () => {
   const playable = state.tracks.filter(t => t.url);
   if (!playable.length) return setStatus('No playable files to cache');
   offlineButton.disabled = true;
+  try { if (navigator.storage?.persist) await navigator.storage.persist(); } catch {}
   const cache = await caches.open('downloads-media-v1');
   let saved = 0;
   for (const track of playable) {
