@@ -1,0 +1,11 @@
+desktop/__pycache__/
+build/
+dist/
+*.spec
+android-sdk/
+mobile/
+mobile/node_modules/
+mobile/android/
+website/debug-bundle*/
+*.db
+*.pyc

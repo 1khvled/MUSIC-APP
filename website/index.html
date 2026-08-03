@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f7f7f5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(registrations => registrations.forEach(registration => registration.unregister()));</script>
+    <title>Library — YouTube Downloader</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="polish.css" />
+    <style>.add-card{background:#fff;border:1px solid #e4e4e0;border-radius:18px;padding:16px;margin:12px 0}.add-row{display:flex;gap:8px}.add-row input,.add-row select{min-width:0;border:1px solid #e4e4e0;border-radius:11px;padding:11px;font:inherit;background:#fff}.add-row input{flex:1}.add-row select{width:125px}.add-row .primary{width:auto;margin:0;padding:0 16px}.add-card .form-message{margin:8px 0 0}.player{display:block;width:min(100%,280px);height:30px;margin-top:8px}.delete-track{border:0;background:#fff0f0;color:#b34d3e;border-radius:12px;width:40px;height:40px;font-size:22px}.track-main{min-width:0}@media(max-width:520px){.add-row{flex-wrap:wrap}.add-row input{flex-basis:100%}.add-row select{flex:1}}</style>
+  </head>
+  <body>
+    <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div><strong>Opening your library</strong><span>Connecting to the local downloader…</span></div>
+    <main class="shell">
+      <header class="topbar">
+        <div><p class="eyebrow">YOUR LIBRARY</p><h1>Downloads</h1></div>
+        <button id="accountButton" class="avatar" aria-label="Account">↗</button>
+      </header>
+
+      <section class="hero">
+        <div><span class="hero-kicker">CLOUD LIBRARY</span><h2>Your music,<br />ready anywhere.</h2><p>Browse the files saved in your database and download them straight to your phone.</p></div>
+        <div class="hero-orb">♪</div>
+      </section>
+      <section id="downloadStatus" class="download-status" hidden><div class="status-head"><strong>Download activity</strong><span id="activityText">Ready</span></div><div id="activityRows"></div></section>
+
+      <div class="toolbar"><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search downloads" /></label><button id="refresh" class="icon-button" aria-label="Refresh">↻</button></div>
+      <section class="add-card"><p class="eyebrow">NEW DOWNLOAD</p><div class="add-row"><input id="urlInput" type="url" placeholder="Paste a YouTube link" /><select id="formatInput"><option value="audio">Audio</option><option value="video">Video</option><option value="audio+video">Audio + Video</option></select><button id="downloadButton" class="primary">Download</button></div><p id="downloadMessage" class="form-message"></p></section>
+      <div class="filters" id="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="recent">Recent</button><button class="filter" data-filter="audio">Audio</button><button class="filter" data-filter="video">Video</button></div>
+
+      <section class="section-heading"><div><p class="eyebrow">LIBRARY</p><h3 id="count">Loading…</h3></div><span id="status" class="status"></span></section>
+      <section id="selectionBar" class="selection-bar" hidden><label><input id="selectAll" type="checkbox"> <span id="selectionCount">0 selected</span></label><button id="clearSelection" class="secondary">Cancel</button><button id="bulkDelete" class="danger">Delete selected</button></section>
+      <section id="tracks" class="tracks" aria-live="polite"></section>
+      <section id="empty" class="empty" hidden><div class="empty-icon">♫</div><h3>No downloads yet</h3><p>When the desktop downloader syncs a file, it will appear here.</p></section>
+
+      <nav class="bottom-nav"><a class="selected" href="#">Library</a><a href="#about">About</a><button id="signOut" hidden>Sign out</button></nav>
+    </main>
+    <dialog id="authDialog"><form method="dialog" id="authForm"><button class="dialog-close" value="cancel">×</button><p class="eyebrow">PRIVATE LIBRARY</p><h2>Sign in</h2><p class="muted">Use your Supabase account to access your downloads.</p><input id="email" type="email" placeholder="Email" required /><input id="password" type="password" placeholder="Password" required /><button class="primary" value="default">Continue</button><p id="authMessage" class="form-message"></p></form></dialog>
+    <script src="config.js"></script><script src="app.js"></script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
+  </body>
+</html>
