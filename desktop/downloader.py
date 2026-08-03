@@ -7,6 +7,8 @@ import os
 import re
 import threading
 import time
+import json
+from urllib.request import Request, urlopen
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -132,6 +134,8 @@ class YouTubeDownloader:
     @staticmethod
     def extract_playlist(url: str) -> Optional[PlaylistInfo]:
         """Parse a YouTube URL and return playlist info (or single-video wrapper)."""
+        if "open.spotify.com/playlist/" in url:
+            return YouTubeDownloader.extract_spotify_playlist(url)
         ydl_opts = {
             "quiet": True,
             "no_warnings": True,
@@ -186,6 +190,53 @@ class YouTubeDownloader:
         except Exception as e:
             print(f"Extract error for {url}: {e}")
             return None
+
+    @staticmethod
+    def extract_spotify_playlist(url: str) -> Optional[PlaylistInfo]:
+        """Read a public Spotify playlist and resolve each song through YouTube."""
+        match = re.search(r"open\.spotify\.com/(?:embed/)?playlist/([A-Za-z0-9]+)", url)
+        if not match:
+            return None
+        playlist_id = match.group(1)
+        request = Request(
+            f"https://open.spotify.com/embed/playlist/{playlist_id}",
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        try:
+            html = urlopen(request, timeout=20).read().decode("utf-8", "ignore")
+            pairs = re.findall(
+                r'"name":"((?:\\.|[^"\\])*)"[^{}]{0,500}?"artists":\[\{"name":"((?:\\.|[^"\\])*)"',
+                html,
+            )
+            songs = []
+            seen = set()
+            for raw_title, raw_artist in pairs:
+                title = json.loads('"' + raw_title + '"')
+                artist = json.loads('"' + raw_artist + '"')
+                key = (title.lower(), artist.lower())
+                if key not in seen:
+                    seen.add(key)
+                    songs.append((title, artist))
+            entries = []
+            search_opts = {"quiet": True, "no_warnings": True, "extract_flat": True, "ignoreerrors": True}
+            with yt_dlp.YoutubeDL(search_opts) as ydl:
+                for title, artist in songs:
+                    info = ydl.extract_info(f"ytsearch1:{artist} - {title} official audio", download=False)
+                    result = next(iter(info.get("entries") or []), None) if info else None
+                    if result and (result.get("id") or result.get("url")):
+                        video_id = result.get("id", "")
+                        entries.append({
+                            "url": result.get("webpage_url") or f"https://youtube.com/watch?v={video_id}",
+                            "title": result.get("title") or title,
+                            "id": video_id,
+                            "duration": result.get("duration", 0),
+                            "thumbnail": result.get("thumbnail", ""),
+                            "channel": result.get("channel") or result.get("uploader") or artist,
+                        })
+            return PlaylistInfo(url=url, title="Spotify playlist", is_playlist=True, entries=entries)
+        except Exception as exc:
+            print(f"Spotify playlist error for {url}: {exc}")
+            return PlaylistInfo(url=url, title="Spotify playlist error", is_playlist=True, entries=[])
 
     def add_url(self, url: str, fmt: FormatType = FormatType.AUDIO):
         """Parse a URL and queue all its entries."""

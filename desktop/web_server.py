@@ -56,7 +56,7 @@ class LocalWebApp:
 
     def add_download(self, url, format_name):
         if not url or not url.startswith(("http://", "https://")):
-            raise ValueError("Enter a valid YouTube URL.")
+            raise ValueError("Enter a valid YouTube or Spotify playlist URL.")
         fmt = {
             "audio": FormatType.AUDIO,
             "video": FormatType.VIDEO,
