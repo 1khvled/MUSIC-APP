@@ -264,6 +264,23 @@ class YouTubeDownloader:
                 self._completed.append(item)
         return len(removed)
 
+    def cancel_queued_url(self, url: str) -> bool:
+        """Remove one matching item that has not started downloading yet."""
+        removed = None
+        with self._queue.mutex:
+            for item in list(self._queue.queue):
+                if item.url == url:
+                    self._queue.queue.remove(item)
+                    removed = item
+                    break
+        if removed is None:
+            return False
+        removed.status = "cancelled"
+        removed.error = "Cancelled by user"
+        with self._lock:
+            self._completed.append(removed)
+        return True
+
     def _worker_loop(self):
         """Worker thread: pulls items from queue and downloads them."""
         try:

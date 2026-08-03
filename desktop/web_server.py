@@ -215,6 +215,18 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/api/stop":
             self.send_json({"cancelled": self.app.downloader.cancel_all()})
             return
+        if self.path == "/api/stop-one":
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+                payload = json.loads(self.rfile.read(length) or b"{}")
+                url = str(payload.get("url", "")).strip()
+                if not url:
+                    self.send_json({"error": "Missing queue item URL"}, 400)
+                    return
+                self.send_json({"cancelled": int(self.app.downloader.cancel_queued_url(url))})
+            except (ValueError, json.JSONDecodeError, TypeError) as exc:
+                self.send_json({"error": str(exc)}, 400)
+            return
         if self.path == "/api/cloud-sync":
             try:
                 length = int(self.headers.get("Content-Length", "0"))
