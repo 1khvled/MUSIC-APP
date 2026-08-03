@@ -51,5 +51,22 @@ playTrack = async function (id) {
   $('#playerTitle').textContent = track.title; $('#playerArtist').textContent = track.artist; $('#playerBar').hidden = false; setStatus('Loading offline audio…');
   try { await player.play(); setStatus(`Playing ${track.title}`); } catch { setStatus('Tap play to start offline audio'); }
 };
+offlineButton.onclick = async () => {
+  const playable = state.tracks.filter(t => t.url);
+  if (!playable.length) return setStatus('No playable files to cache');
+  offlineButton.disabled = true;
+  const cache = await caches.open('downloads-media-v1');
+  let saved = 0;
+  for (const track of playable) {
+    setStatus(`Saving offline ${saved + 1}/${playable.length}…`);
+    try {
+      const response = await fetch(track.url, { cache: 'reload' });
+      if (response.ok) { await cache.put(track.url, response.clone()); saved += 1; }
+    } catch { /* keep saving the remaining tracks */ }
+  }
+  if (saved) { localStorage.setItem('yt-offline-ready', '1'); offlineButton.textContent = saved === playable.length ? 'Offline saved' : 'Offline partial'; }
+  setStatus(`${saved}/${playable.length} files cached for offline`);
+  offlineButton.disabled = false;
+};
 if (!LOCAL_MODE) $('#urlInput').closest('.add-card').hidden = true;
 load(); setTimeout(() => { if (!LOCAL_MODE && !navigator.onLine && !state.session) { const cached = JSON.parse(localStorage.getItem(TRACK_CACHE) || '[]'); if (cached.length) { state.tracks = cached; $('#cloudNotice').hidden = true; render(); setStatus(`${cached.length} files · offline`); } } }, 0); pollStatus(); setInterval(() => { pollStatus(); if (LOCAL_MODE) load(); }, 3000);
