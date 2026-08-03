@@ -8,6 +8,7 @@ import re
 import threading
 import time
 import json
+from html import unescape
 from urllib.request import Request, urlopen
 from dataclasses import dataclass, field
 from enum import Enum
@@ -217,6 +218,19 @@ class YouTubeDownloader:
                 if key not in seen:
                     seen.add(key)
                     songs.append((title, artist))
+            if not songs:
+                html_pairs = re.findall(
+                    r'<h3 class="[^"]*TracklistRow_title[^"]*"[^>]*>(.*?)</h3>.*?'
+                    r'<h4 class="[^"]*TracklistRow_subtitle[^"]*"[^>]*>(.*?)</h4>',
+                    html,
+                    flags=re.DOTALL,
+                )
+                for raw_title, raw_artist in html_pairs:
+                    title = unescape(re.sub(r"<[^>]+>", "", raw_title)).strip()
+                    artist = unescape(re.sub(r"<[^>]+>", "", raw_artist)).strip()
+                    if title and artist and (title.lower(), artist.lower()) not in seen:
+                        seen.add((title.lower(), artist.lower()))
+                        songs.append((title, artist))
             entries = []
             search_opts = {"quiet": True, "no_warnings": True, "extract_flat": True, "ignoreerrors": True}
             with yt_dlp.YoutubeDL(search_opts) as ydl:
