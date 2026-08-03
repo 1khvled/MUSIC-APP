@@ -57,12 +57,16 @@ class PlaylistInfo:
 class ProgressCallback:
     """Hook for yt-dlp progress reporting — thread-safe with item snapshot."""
 
-    def __init__(self, item: DownloadItem, on_progress: Callable):
+    def __init__(self, item: DownloadItem, on_progress: Callable, cancel_event: threading.Event):
         self.item = item
         self.on_progress = on_progress
+        self.cancel_event = cancel_event
         self._lock = threading.Lock()
 
     def __call__(self, d):
+        if self.cancel_event.is_set():
+            self.item.status = "cancelled"
+            raise yt_dlp.utils.DownloadError("Download cancelled by user")
         with self._lock:
             if d["status"] == "downloading":
                 total = d.get("total_bytes") or d.get("total_bytes_estimate", 0)
@@ -123,6 +127,7 @@ class YouTubeDownloader:
         self._running = False
         self._threads: list[threading.Thread] = []
         self._stop_event = threading.Event()
+        self._cancel_event = threading.Event()
 
     @staticmethod
     def extract_playlist(url: str) -> Optional[PlaylistInfo]:
@@ -228,6 +233,7 @@ class YouTubeDownloader:
             return
         self._running = True
         self._stop_event.clear()
+        self._cancel_event.clear()
         max_workers = min(self.config.max_concurrent, 5)
 
         for _ in range(max_workers):
@@ -242,13 +248,18 @@ class YouTubeDownloader:
 
     def cancel_all(self):
         """Stop workers and remove every item still waiting in the queue."""
+        self._cancel_event.set()
         self.stop()
         removed = []
         with self._queue.mutex:
             while self._queue.queue:
                 removed.append(self._queue.queue.popleft())
-        for item in removed:
+        with self._lock:
+            active = list(self._active)
+        for item in active + removed:
             item.status = "cancelled"
+            item.error = "Cancelled by user"
+        for item in removed:
             with self._lock:
                 self._completed.append(item)
         return len(removed)
@@ -338,7 +349,7 @@ class YouTubeDownloader:
         opts = self._get_ydl_opts(item)
 
         # Wire up progress callback
-        cb = ProgressCallback(item, self.on_progress)
+        cb = ProgressCallback(item, self.on_progress, self._cancel_event)
         opts["progress_hooks"] = [cb]
 
         try:
@@ -403,9 +414,10 @@ class YouTubeDownloader:
                                                        track_id=track_id)
 
         except yt_dlp.utils.DownloadError as e:
-            item.status = "failed"
-            item.error = f"YouTube error: {e}"
-            self._update_db_error(item, str(e))
+            item.status = "cancelled" if self._cancel_event.is_set() else "failed"
+            item.error = "Cancelled by user" if self._cancel_event.is_set() else f"YouTube error: {e}"
+            if item.status == "failed":
+                self._update_db_error(item, str(e))
             print(f"Download error for {item.url}: {e}")
 
         except Exception as e:
