@@ -77,12 +77,12 @@ if ('mediaSession' in navigator) {
 }
 document.addEventListener('click', async event => {
   const link = event.target.closest?.('a.download');
-  if (!link || !link.href || !navigator.onLine) return;
+  if (!link || !link.href) return;
   event.preventDefault();
   link.setAttribute('aria-busy', 'true');
   try {
-    const response = await fetch(link.href);
-    if (!response.ok) throw Error('download failed');
+    const response = navigator.onLine ? await fetch(link.href) : await caches.match(link.href, { cacheName: 'downloads-media-v1' });
+    if (!response || !response.ok) throw Error('download failed');
     const objectUrl = URL.createObjectURL(await response.blob());
     const save = document.createElement('a'); save.href = objectUrl; save.download = link.getAttribute('download') || 'music-download'; save.click();
     setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
