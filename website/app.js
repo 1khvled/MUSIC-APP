@@ -75,5 +75,19 @@ if ('mediaSession' in navigator) {
   mediaAction('play', () => togglePlayer()); mediaAction('pause', () => togglePlayer());
   mediaAction('previoustrack', () => stepTrack(-1)); mediaAction('nexttrack', () => stepTrack(1));
 }
+document.addEventListener('click', async event => {
+  const link = event.target.closest?.('a.download');
+  if (!link || !link.href || !navigator.onLine) return;
+  event.preventDefault();
+  link.setAttribute('aria-busy', 'true');
+  try {
+    const response = await fetch(link.href);
+    if (!response.ok) throw Error('download failed');
+    const objectUrl = URL.createObjectURL(await response.blob());
+    const save = document.createElement('a'); save.href = objectUrl; save.download = link.getAttribute('download') || 'music-download'; save.click();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  } catch { window.location.href = link.href; }
+  finally { link.removeAttribute('aria-busy'); }
+});
 if (!LOCAL_MODE) $('#urlInput').closest('.add-card').hidden = true;
 load(); setTimeout(() => { if (!LOCAL_MODE && !navigator.onLine && !state.session) { const cached = JSON.parse(localStorage.getItem(TRACK_CACHE) || '[]'); if (cached.length) { state.tracks = cached; $('#cloudNotice').hidden = true; render(); setStatus(`${cached.length} files · offline`); } } }, 0); pollStatus(); setInterval(() => { pollStatus(); if (LOCAL_MODE) load(); }, 3000);
