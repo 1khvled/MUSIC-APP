@@ -68,5 +68,11 @@ offlineButton.onclick = async () => {
   setStatus(`${saved}/${playable.length} files cached for offline`);
   offlineButton.disabled = false;
 };
+if ('mediaSession' in navigator) {
+  $('#mainPlayer').addEventListener('playing', () => { const track = state.tracks.find(item => String(item.id) === String(state.playbackId)); if (track) navigator.mediaSession.metadata = new MediaMetadata({ title: track.title, artist: track.artist || 'Unknown artist', album: track.album || 'Downloads' }); });
+  const mediaAction = (action, handler) => { try { navigator.mediaSession.setActionHandler(action, handler); } catch {} };
+  mediaAction('play', () => togglePlayer()); mediaAction('pause', () => togglePlayer());
+  mediaAction('previoustrack', () => stepTrack(-1)); mediaAction('nexttrack', () => stepTrack(1));
+}
 if (!LOCAL_MODE) $('#urlInput').closest('.add-card').hidden = true;
 load(); setTimeout(() => { if (!LOCAL_MODE && !navigator.onLine && !state.session) { const cached = JSON.parse(localStorage.getItem(TRACK_CACHE) || '[]'); if (cached.length) { state.tracks = cached; $('#cloudNotice').hidden = true; render(); setStatus(`${cached.length} files · offline`); } } }, 0); pollStatus(); setInterval(() => { pollStatus(); if (LOCAL_MODE) load(); }, 3000);
