@@ -159,6 +159,7 @@ class Handler(BaseHTTPRequestHandler):
                 "active": self.app.downloader.active_count,
                 "running": self.app.downloader.is_running(),
                 "active_items": [{"title": item.title or item.url, "progress": item.progress, "status": item.status, "speed": item.speed, "eta": item.eta} for item in active],
+                "queued_items": [{"title": item.title or item.url, "url": item.url, "status": item.status} for item in self.app.downloader.get_queued()],
                 "completed": [{"title": item.title or item.url, "status": item.status, "error": item.error} for item in completed],
             })
             return
@@ -211,6 +212,9 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_POST(self):
+        if self.path == "/api/stop":
+            self.send_json({"cancelled": self.app.downloader.cancel_all()})
+            return
         if self.path == "/api/cloud-sync":
             try:
                 length = int(self.headers.get("Content-Length", "0"))
