@@ -134,7 +134,7 @@ class YouTubeDownloader:
     @staticmethod
     def extract_playlist(url: str) -> Optional[PlaylistInfo]:
         """Parse a YouTube URL and return playlist info (or single-video wrapper)."""
-        if "open.spotify.com/playlist/" in url:
+        if "open.spotify.com/" in url and "/playlist/" in url:
             return YouTubeDownloader.extract_spotify_playlist(url)
         ydl_opts = {
             "quiet": True,
