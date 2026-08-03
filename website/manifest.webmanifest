@@ -3,8 +3,8 @@
   "short_name": "Downloads",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f7f7f5",
-  "theme_color": "#f7f7f5",
-  "description": "A phone-first library for downloading your database files.",
-  "icons": []
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "description": "A phone-first music library with playback and offline downloads.",
+  "icons": [{"src":"icon.svg","sizes":"192x192","type":"image/svg+xml","purpose":"any maskable"}]
 }

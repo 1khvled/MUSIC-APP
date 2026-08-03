@@ -1,5 +1,5 @@
 const CACHE = 'downloads-shell-v4';
-const SHELL = ['./', './index.html', './styles.css', './polish.css', './app.js', './config.js', './manifest.webmanifest'];
+const SHELL = ['./', './index.html', './styles.css', './polish.css', './app.js', './config.js', './manifest.webmanifest', './icon.svg'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL))));
 self.addEventListener('install', event => self.skipWaiting());
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim().then(() => caches.keys()).then(keys => Promise.all(keys.filter(key => ![CACHE, 'downloads-media-v1'].includes(key)).map(key => caches.delete(key))))));
