@@ -1,4 +1,4 @@
-const CACHE = 'downloads-shell-v4';
+const CACHE = 'downloads-shell-v5';
 const SHELL = ['./', './index.html', './styles.css', './polish.css', './mobile-fixes.css', './app.js', './config.js', './manifest.webmanifest', './icon.svg'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL))));
 self.addEventListener('install', event => self.skipWaiting());
