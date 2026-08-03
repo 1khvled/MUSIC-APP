@@ -3,11 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f7f7f5" />
+    <meta name="theme-color" content="#121212" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(registrations => registrations.forEach(registration => registration.unregister()));</script>
     <title>Library — YouTube Downloader</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="polish.css" />
@@ -37,7 +36,8 @@
       <section id="tracks" class="tracks" aria-live="polite"></section>
       <section id="empty" class="empty" hidden><div class="empty-icon">♫</div><h3>No downloads yet</h3><p>When the desktop downloader syncs a file, it will appear here.</p></section>
 
-      <nav class="bottom-nav"><a class="selected" href="#">Library</a><a href="#about">About</a><button id="signOut" hidden>Sign out</button></nav>
+      <section id="playerBar" class="player-bar" hidden><div class="player-art">♫</div><div class="player-copy"><strong id="playerTitle">Nothing playing</strong><span id="playerArtist">Select a track</span></div><audio id="mainPlayer" controls preload="metadata"></audio></section>
+      <nav class="bottom-nav"><a class="selected" href="#">Library</a><a href="#about">About</a><button id="offlineButton">Offline</button><button id="signOut" hidden>Sign out</button></nav>
     </main>
     <dialog id="authDialog"><form method="post" id="authForm"><button type="button" class="dialog-close" id="closeAuth">×</button><p class="eyebrow">PRIVATE LIBRARY</p><h2>Sign in</h2><p class="muted">Use your Supabase account to access your downloads.</p><input id="email" type="email" placeholder="Email" required /><input id="password" type="password" placeholder="Password" required /><button type="submit" class="primary">Continue</button><p id="authMessage" class="form-message"></p></form></dialog>
     <script src="config.js"></script><script src="app.js"></script>
