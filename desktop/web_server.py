@@ -248,7 +248,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": str(exc)}, 400)
 
 
-def serve(host="0.0.0.0", port=4179):
+def serve(host="0.0.0.0", port=4180):
     app = LocalWebApp()
     Handler.app = app
     server = ThreadingHTTPServer((host, port), Handler)
