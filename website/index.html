@@ -36,7 +36,7 @@
       <section id="tracks" class="tracks" aria-live="polite"></section>
       <section id="empty" class="empty" hidden><div class="empty-icon">♫</div><h3>No downloads yet</h3><p>When the desktop downloader syncs a file, it will appear here.</p></section>
 
-      <section id="playerBar" class="player-bar" hidden><div class="player-art">♫</div><div class="player-copy"><strong id="playerTitle">Nothing playing</strong><span id="playerArtist">Select a track</span></div><audio id="mainPlayer" controls preload="metadata"></audio></section>
+      <section id="playerBar" class="player-bar" hidden><div class="player-art">♫</div><div class="player-copy"><strong id="playerTitle">Nothing playing</strong><span id="playerArtist">Select a track</span></div><audio id="mainPlayer" controls crossorigin="anonymous" preload="metadata"></audio></section>
       <nav class="bottom-nav"><a class="selected" href="#">Library</a><a href="#about">About</a><button id="offlineButton">Offline</button><button id="signOut" hidden>Sign out</button></nav>
     </main>
     <dialog id="authDialog"><form method="post" id="authForm"><button type="button" class="dialog-close" id="closeAuth">×</button><p class="eyebrow">PRIVATE LIBRARY</p><h2>Sign in</h2><p class="muted">Use your Supabase account to access your downloads.</p><input id="email" type="email" placeholder="Email" required /><input id="password" type="password" placeholder="Password" required /><button type="submit" class="primary">Continue</button><p id="authMessage" class="form-message"></p></form></dialog>
