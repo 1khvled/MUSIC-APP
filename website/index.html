@@ -39,7 +39,7 @@
 
       <nav class="bottom-nav"><a class="selected" href="#">Library</a><a href="#about">About</a><button id="signOut" hidden>Sign out</button></nav>
     </main>
-    <dialog id="authDialog"><form method="dialog" id="authForm"><button class="dialog-close" value="cancel">×</button><p class="eyebrow">PRIVATE LIBRARY</p><h2>Sign in</h2><p class="muted">Use your Supabase account to access your downloads.</p><input id="email" type="email" placeholder="Email" required /><input id="password" type="password" placeholder="Password" required /><button class="primary" value="default">Continue</button><p id="authMessage" class="form-message"></p></form></dialog>
+    <dialog id="authDialog"><form method="post" id="authForm"><button type="button" class="dialog-close" id="closeAuth">×</button><p class="eyebrow">PRIVATE LIBRARY</p><h2>Sign in</h2><p class="muted">Use your Supabase account to access your downloads.</p><input id="email" type="email" placeholder="Email" required /><input id="password" type="password" placeholder="Password" required /><button type="submit" class="primary">Continue</button><p id="authMessage" class="form-message"></p></form></dialog>
     <script src="config.js"></script><script src="app.js"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
   </body>
