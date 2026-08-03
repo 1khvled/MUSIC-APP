@@ -1,0 +1,5 @@
+.shell,.tracks,.track{min-width:0}
+.track{width:100%;max-width:100%}
+.track-main{min-width:0;overflow:hidden}
+.hero{max-width:100%}
+@media (max-width:380px){.shell{padding-left:14px;padding-right:14px}.track{gap:8px;padding:8px}.cover{width:46px;height:46px}.download,.play-track{width:36px;height:36px}.bottom-nav{gap:14px;padding-left:12px;padding-right:12px}}
