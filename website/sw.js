@@ -8,7 +8,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(fetch(event.request).then(response => {
     if (response.ok || response.type === 'opaque') {
       const copy = response.clone();
-      caches.open(CACHE).then(cache => cache.put(event.request, copy));
+      caches.open(CACHE).then(cache => cache.put(event.request, copy)).catch(() => {});
     }
     return response;
   }).catch(() => caches.match(event.request)));
