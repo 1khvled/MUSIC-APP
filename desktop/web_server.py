@@ -92,13 +92,13 @@ class LocalWebApp:
                 failed += 1
                 continue
             remote_name = Path(path).name
-            if not provider.upload_file(path, remote_name):
-                failed += 1
-                continue
             data = dict(row)
             data["file_path"] = f"{session['user']['id']}/{remote_name}"
+            uploaded_file = provider.upload_file(path, remote_name)
             if provider.sync_track(data):
                 uploaded += 1
+                if not uploaded_file:
+                    failed += 1
             else:
                 failed += 1
         return {"uploaded": uploaded, "failed": failed}
